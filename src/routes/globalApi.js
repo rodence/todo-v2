@@ -1,14 +1,14 @@
 import axios from "axios";
 
 
-export const GetRoutes = async (routename) =>{
+export const GetRoutes = async (routename,params={}) =>{
     return await axios
-    .get(routename)
+    .get(routename,{params})
     .then((response)=>{
         return response
     })
     .catch((error)=>{
-        console.error("error", error);
+        console.error("error getting request", error);
     });
 };
 
