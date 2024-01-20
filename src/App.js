@@ -1,8 +1,10 @@
-import { Route, Router, Routes, Link } from "react-router-dom";
+import { Route, Routes, Link } from "react-router-dom";
 import { AllTask } from "./component/allTask";
 import { OngoingTask } from "./component/ongoingTask";
 import { CompletedTask } from "./component/completedTask";
 import { CancelledTask } from "./component/cancelled";
+import { useState } from "react";
+import { PostRoutes } from "./routes/globalApi";
 import * as FA from "react-icons/fa";
 import * as PI from "react-icons/pi";
 import * as BI from "react-icons/bi";
@@ -15,21 +17,18 @@ function App() {
       icon: <FA.FaTasks />,
       element: <AllTask />,
     },
-
     {
       name: "Ongoing",
       path: "/ongoing",
       icon: <PI.PiClockFill />,
       element: <OngoingTask />,
     },
-
     {
       name: "Completed",
       path: "/completed",
       icon: <BI.BiTask />,
       element: <CompletedTask />,
     },
-
     {
       name: "Cancelled",
       path: "/cancelled",
@@ -37,53 +36,85 @@ function App() {
       element: <CancelledTask />,
     },
   ];
-  return (
-    <div>
-      <div className="flex flex-row items-center justify-center ">
-        <div className="navbar bg-base-100 flex flex-col items-center justify-center">
-          <div className="navbar-center">
-            <a className="btn btn-ghost text-xl">TodoList App</a>
-          </div>
-          <div>
-            <form className="text-neutral-800 relative overflow-hidden flex flex-col justify-around w-96 border border-neutral-500 rounded-lg bg-neutral-50 p-3 px-6">
-              <div className="flex gap-1">
-                <div className="relative rounded-lg w-64 overflow-hidden  before:absolute before:w-12 before:h-12 before:content['']  ">
-                  <input
-                    placeholder="Add task here..."
-                    className="relative bg-transparent ring-0 outline-none border border-neutral-500 text-neutral-900 placeholder-violet-700 text-sm rounded-lg focus:ring-violet-500 placeholder-opacity-60 focus:border-violet-500 block w-full p-2.5 checked:bg-emerald-500"
-                    type="text"
-                    required
-                  />
+
+  const [task, setTask] = useState({ todo: '' });
+
+  const handleChange = (e) => {
+    setTask({
+      ...task,
+      todo: e.target.value,
+    });
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log('click');
+
+    const apiEndpoint = 'http://192.168.1.50:3001/api/v2/todo';
+
+    try {
+      const response = await PostRoutes(apiEndpoint, task);
+
+      console.log(response); 
+
+      // Reset the task state after successfully adding the task
+      setTask({ todo: '' });
+    } catch (error) {
+      console.error('Error: ', error);
+    }
+  }
+
+    return (
+      <div>
+        <div className="flex flex-row items-center justify-center ">
+          <div className="navbar bg-base-100 flex flex-col items-center justify-center">
+            <div className="navbar-center">
+              <a className="btn btn-ghost text-xl">TodoList App</a>
+            </div>
+            <div>
+              <form    className="text-neutral-800 relative overflow-hidden flex flex-col justify-around w-96 border border-neutral-500 rounded-lg bg-neutral-50 p-3 px-6">
+                <div className="flex gap-1">
+                  <div className="relative rounded-lg w-64 overflow-hidden  before:absolute before:w-12 before:h-12 before:content['']  ">
+                    <input
+                      placeholder="Add task here..."
+                      className="relative bg-transparent ring-0 outline-none border border-neutral-500 text-neutral-900 placeholder-violet-700 text-sm rounded-lg focus:ring-violet-500 placeholder-opacity-60 focus:border-violet-500 block w-full p-2.5 checked:bg-emerald-500"
+                      type="text"
+                      onChange={handleChange}
+                      
+                        value={task.todo}
+                      required
+                    />
+                  </div>  
+                  <button
+                    className="btn btn-outline btn-info0  p-2 rounded-lg-400 text-xs"
+                    type="submit"
+                    onClick={handleSubmit}
+                  >
+                    click here to add
+                  </button>
                 </div>
-                <button
-                  className="btn btn-outline btn-info0  p-2 rounded-lg-400 text-xs"
-                  type="submit"
-                >
-                  click here to add
-                </button>
-              </div>
-            </form>
-          </div>
-          <div className="flex flex-row items-center justify-center gap-11 mt-6">
-            {nav.map(({ name, icon, path }) => (
-              <Link to={path} key={name}>
-                <div className="flex flex-row items-center gap-2">
-                  {name}
-                  {icon}
-                </div>
-              </Link>
-            ))}
+              </form>
+            </div>
+            <div className="flex flex-row items-center justify-center gap-11 mt-6">
+              {nav.map(({ name, icon, path }) => (
+                <Link to={path} key={name}>
+                  <div className="flex flex-row items-center gap-2">
+                    {name}
+                    {icon}
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
+        <Routes>
+          <Route path="/" element={<AllTask />} />
+          <Route path="/ongoing" element={<OngoingTask />} />
+          <Route path="/completed" element={<CompletedTask />} />
+          <Route path="/cancelled" element={<CancelledTask />} />
+        </Routes>
       </div>
-      <Routes>
-        <Route path="/" element={<AllTask />} />
-        <Route path="/ongoing" element={<OngoingTask />} />
-        <Route path="/completed" element={<CompletedTask />} />
-        <Route path="/cancelled" element={<CancelledTask />} />
-      </Routes>
-    </div>
-  );
-}
+    );
+  }
 
-export default App;
+  export default App;

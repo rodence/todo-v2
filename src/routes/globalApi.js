@@ -12,9 +12,14 @@ export const GetRoutes = async (routename) =>{
     });
 };
 
-export const PostRoutes = async (routename)=>{
+export const PostRoutes = async (routename, data)=>{
     return await axios
-    .post(routename)
+    .post(routename, data,{
+        headers: {
+            "Content-Type": "application/json",
+        },  
+    
+    })
     .then((response)=>{
         return response
     })
